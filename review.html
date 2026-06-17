@@ -244,7 +244,7 @@ body{background:var(--bg);min-height:100vh}
       </div>
       <div class="filter-row">
         <div class="filter-box" style="gap:6px">
-          <label>하위 필터</label>
+          <label>평점 필터</label>
           <button id="rBtn1" onclick="toggleRatingBtn(1)" style="padding:4px 12px;border-radius:99px;border:1px solid #111;background:#111;color:#fff;font-size:10px;font-weight:500;cursor:pointer;font-family:inherit">1점</button>
           <button id="rBtn2" onclick="toggleRatingBtn(2)" style="padding:4px 12px;border-radius:99px;border:1px solid #111;background:#111;color:#fff;font-size:10px;font-weight:500;cursor:pointer;font-family:inherit">2점</button>
           <button id="rBtn3" onclick="toggleRatingBtn(3)" style="padding:4px 12px;border-radius:99px;border:1px solid #111;background:#111;color:#fff;font-size:10px;font-weight:500;cursor:pointer;font-family:inherit">3점</button>
@@ -260,7 +260,7 @@ body{background:var(--bg);min-height:100vh}
       </div>
       <table class="rv-table">
         <thead><tr>
-          <th style="width:36px">순서</th><th style="width:38px">하위</th>
+          <th style="width:36px">순서</th><th style="width:38px">평점</th>
           <th style="width:46px">영향력</th><th style="width:46px">등급</th>
           <th style="width:36px">도움수</th><th style="width:36px">포토</th>
           <th style="width:90px">일회몰주문번호</th><th>리뷰 내용</th>
@@ -413,12 +413,12 @@ function parseTab2(){
   return raw2.map(r=>{
     const d=String(r['리뷰등록일']||'').trim(),p=d.split('-');
     if(!p[0]||!p[1]) return null;
-    const rating=parseInt(r['구매자 하위'])||0;
-    const content=String(r['리뷰세세내용']||'');
+    const rating=parseInt(r['구매자 평점'])||0;
+    const content=String(r['리뷰상세내용']||'');
     const help=parseInt(r['리뷰도움수'])||0;
     const photoLink=String(r['포토/동영상리뷰링크']||r['M']||Object.values(r)[12]||'').trim();
     const hasPhoto=photoLink.length>0;
-    const orderId=String(r['주문번호']||r['C']||Object.values(r)[2]||'').trim();
+    const orderId=String(r['상품주문번호']||r['C']||Object.values(r)[2]||'').trim();
     const score=calcScore(rating,help,!!r['관련리뷰글번호'],content.length,hasPhoto);
     const prodName=String(r['상품명']||'');
     const{category,model}=classifyProduct(prodName);
@@ -577,7 +577,7 @@ function renderTab2(p2,p1){
       <div class="topN-score">${r.score}<span style="font-size:12px"> 점</span></div>
       <div class="topN-badge" style="background:${sl.bg};color:${sl.color}">${sl.lv}</div>
       <div class="topN-content">${r.content}</div>
-      <div class="topN-meta">하위 ${r.rating}점 · 도움 ${r.help}개</div>
+      <div class="topN-meta">평점 ${r.rating}점 · 도움 ${r.help}개</div>
       <div class="topN-meta">${r.category}</div>
     </div>`;
   }).join('');
