@@ -209,7 +209,7 @@ body{background:var(--bg);min-height:100vh}
                 · 하위: 1점 →+6 / 2점 →+4 / 3점 →+2<br>
                 · 도움수: 그대로 합산<br>
                 · 관련 리뷰: +5<br>
-                · 글자수: 50자↑→+5 / 30~49자→+3 / 30자↓→+1<br>
+                · 글자수: 50자↑→+10 / 30~49자→+7 / 29자↓→+3<br>
                 · 포토/영상 첨부: +5<br>
                 <span style="color:#888;display:block;margin-top:6px">낮음(≤10)·보통(11~15)·높음(16~20)·심각(21↑)</span>
               </div>
@@ -240,7 +240,7 @@ body{background:var(--bg);min-height:100vh}
       </div>
       <div class="grade-info">
         <div><strong>등급 기준</strong> &nbsp;낮음 ≤10점 &nbsp;·&nbsp; 보통 11~15점 &nbsp;·&nbsp; 높음 16~20점 &nbsp;·&nbsp; 심각 21점↑</div>
-        <div style="margin-top:3px"><strong>점수 기준</strong> &nbsp;하위(1점 +6 / 2점 +4 / 3점 +2) + 도움수 + 관련리뷰(+5) + 글자수(50자↑+5 / 30~49자+3 / 30자↑+1) + 포토/영상(+5)</div>
+        <div style="margin-top:3px"><strong>점수 기준</strong> &nbsp;하위(1점 +6 / 2점 +4 / 3점 +2) + 도움수 + 관련리뷰(+5) + 글자수(50자↑+10 / 30~49자+7 / 29자↓+3) + 포토/영상(+5)</div>
       </div>
       <div class="filter-row">
         <div class="filter-box" style="gap:6px">
@@ -428,7 +428,7 @@ function parseTab2(){
 }
 
 function calcScore(r,h,rel,len,photo=false){
-  return({1:3,2:2,3:1}[r]||0)*2+h+(rel?5:0)+(len>=50?5:len>=30?3:1)+(photo?5:0);
+  return({1:3,2:2,3:1}[r]||0)*2+h+(rel?5:0)+(len>=50?10:len>=30?7:3)+(photo?5:0);
 }
 function scoreLevel(s){
   if(s<=10) return{lv:'낮음',color:'#999',bg:'#F5F5F5'};
