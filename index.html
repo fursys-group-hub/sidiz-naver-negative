@@ -231,11 +231,11 @@ body{background:var(--bg);min-height:100vh}
           </div>
           <div class="cc">
             <div class="ctit">월 실적 추이</div>
-            <div class="csub">실적(막대) · 목표(영역) · 달성율%(우축)</div>
+            <div class="csub">올해 실적(막대) · 올해 목표(영역) · 전년 실적(점선)</div>
             <div class="leg">
-              <div class="li"><div class="lr" style="background:#111"></div>실적</div>
-              <div class="li"><div class="la" style="background:#888"></div>목표 범위</div>
-              <div class="li"><div class="ll" style="background:#FFD66B"></div>달성율%</div>
+              <div class="li"><div class="lr" style="background:#111"></div>올해 실적</div>
+              <div class="li"><div class="la" style="background:#888"></div>올해 목표</div>
+              <div class="li"><div style="width:12px;height:0;border-top:1.5px dashed #999;flex-shrink:0"></div>전년 실적</div>
             </div>
             <div style="position:relative;height:155px"><canvas id="c1"></canvas></div>
             <div style="margin-top:12px;border-top:1px solid #F0F0F0;padding-top:10px">
@@ -586,6 +586,7 @@ function parseTab1(){
       buyers:toN(r['구매자수(명)']),refundAmt:toN(r['환불금액']),
       refundCnt:toN(r['환불건']),refRate:toRate(r['환불비율(금액)']),
       reviews:toN(r['리뷰수']),
+      prevERP:toN(r['전년매출']||r['K']),
     };
   }).filter(Boolean);
 }
@@ -627,7 +628,7 @@ function render(){
   const yrs=[...new Set([...p1.map(r=>r.year),...p2.map(r=>r.year)])].filter(y=>y>=2025).sort();
   if(!yrs.includes(selYear)&&yrs.length) selYear=Math.max(...yrs);
   const p1Yrs=new Set(p1.map(r=>r.year));
-  const p1Mos=new Set(p1.filter(r=>r.year===selYear&&r.ERP>0).map(r=>r.month));
+  const p1Mos=new Set(p1.filter(r=>r.year===selYear&&(r.ERP>0||r.buyers>0||r.reviews>0)).map(r=>r.month));
   const p2Mos=new Set(p2.filter(r=>r.year===selYear).map(r=>r.month));
   [1,2].forEach(t=>{
     const ye=document.getElementById(`yr${t}`);if(!ye)return;
@@ -712,15 +713,19 @@ function renderTab1(p1){
   });
 
   // c1
+  const prevERPD=ml.map((_,i)=>{
+    const cRow=cur.find(x=>x.month===i+1);
+    if(cRow?.prevERP) return cRow.prevERP;
+    return prev.find(x=>x.month===i+1)?.ERP||null;
+  });
   mkC('c1',{type:'bar',data:{labels:ml,datasets:[
-    {label:'목표',data:tgtD,type:'line',order:3,fill:true,tension:0.4,
+    {label:'올해 목표',data:tgtD,type:'line',order:3,fill:true,tension:0.4,
      borderColor:'rgba(150,150,150,0.35)',borderWidth:1,pointRadius:0,
      backgroundColor:ctx=>makeGrad(ctx,150,150,150,0.18,0.01),yAxisID:'y'},
-    {label:'실적',data:erpD,type:'bar',order:2,backgroundColor:'#111',borderRadius:5,
+    {label:'전년 실적',data:prevERPD,type:'line',order:2,fill:false,tension:0.4,
+     borderColor:'#999',borderWidth:1.5,borderDash:[5,4],pointRadius:0,yAxisID:'y'},
+    {label:'올해 실적',data:erpD,type:'bar',order:1,backgroundColor:'#111',borderRadius:5,
      barPercentage:0.5,yAxisID:'y',_showLabel:true,_fmt:v=>v?f억(v):''},
-    {label:'달성율%',data:achD,type:'line',order:1,fill:false,tension:0.4,
-     borderColor:'#FFD66B',borderWidth:1.5,pointRadius:2.5,pointBackgroundColor:'#FFD66B',
-     yAxisID:'y2',_showLabel:true,_fmt:v=>v?v+'%':''},
   ]},options:{...bO,
     plugins:{...bO.plugins,tooltip:{
       backgroundColor:'rgba(17,17,17,0.88)',titleFont:{size:10,family:'Inter'},bodyFont:{size:10,family:'Inter'},cornerRadius:8,padding:8,
@@ -729,20 +734,19 @@ function renderTab1(p1){
       callbacks:{label(ctx){
         const v=ctx.raw,l=ctx.dataset.label;
         if(v===null||v===undefined) return null;
-        if(l==='목표') return ` 목표: ${f억(v)}`;
-        if(l==='실적') return ` 실적: ${f억(v)}`;
-        if(l==='달성율%') return ` 달성율: ${v}%`;
+        if(l==='올해 목표') return ` 목표: ${f억(v)}`;
+        if(l==='올해 실적') return ` 실적: ${f억(v)}`;
+        if(l==='전년 실적') return ` 전년: ${f억(v)}`;
         return ` ${l}: ${v}`;
       }}
     }},
     scales:{
     x:{grid:{display:false},ticks:{font:{size:9,family:'Inter'},color:'#AAA'},border:{display:false}},
     y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:9,family:'Inter'},color:'#AAA'},border:{display:false},position:'left'},
-    y2:{grid:{display:false},ticks:{font:{size:9,family:'Inter'},color:'#B8860B',callback:v=>v+'%'},border:{display:false},position:'right'},
   }}});
 
   // c2: 구매자수
-  const buyD=ml.map((_,i)=>curR.find(x=>x.month===i+1)?.buyers||null);
+  const buyD=ml.map((_,i)=>cur.find(x=>x.month===i+1)?.buyers||null);
   const prevBuy=ml.map((_,i)=>prev.find(x=>x.month===i+1)?.buyers||null);
   document.getElementById('bsub').textContent=`${selYear}년 / ${selYear-1}년 비교`;
   mkC('c2',{type:'line',data:{labels:ml,datasets:[
@@ -763,9 +767,9 @@ function renderTab1(p1){
   }}}});
 
   // c3: 환불금액=영역, 환불율%=선, 커서에 환불금액+건수+%모두 툴팁표시 (건수 라인 제거)
-  const refAmtD=ml.map((_,i)=>curR.find(x=>x.month===i+1)?.refundAmt||null);
-  const refCntD=ml.map((_,i)=>curR.find(x=>x.month===i+1)?.refundCnt||null);
-  const refRateD=ml.map((_,i)=>curR.find(x=>x.month===i+1)?.refRate||null);
+  const refAmtD=ml.map((_,i)=>cur.find(x=>x.month===i+1)?.refundAmt||null);
+  const refCntD=ml.map((_,i)=>cur.find(x=>x.month===i+1)?.refundCnt||null);
+  const refRateD=ml.map((_,i)=>cur.find(x=>x.month===i+1)?.refRate||null);
   mkC('c3',{type:'line',data:{labels:ml,datasets:[
     {label:'환불금액',data:refAmtD,fill:true,tension:0.4,
      borderColor:'rgba(150,150,150,0.35)',borderWidth:1,pointRadius:0,
@@ -805,7 +809,7 @@ function renderTab1(p1){
   }});
 
   // c4: 리뷰수
-  const rvD=ml.map((_,i)=>curR.find(x=>x.month===i+1)?.reviews||null);
+  const rvD=ml.map((_,i)=>cur.find(x=>x.month===i+1)?.reviews||null);
   const prevRv=ml.map((_,i)=>prev.find(x=>x.month===i+1)?.reviews||null);
   document.getElementById('rsub').textContent=`${selYear}년 / ${selYear-1}년 비교`;
   mkC('c4',{type:'line',data:{labels:ml,datasets:[
