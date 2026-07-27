@@ -375,9 +375,10 @@ Chart.register(labelPlugin);
 async function fetchAll(){
   document.getElementById('last-updated').textContent='데이터 동기화 중...';
   try{
+    const t=Date.now();
     const[j1,j2,jm]=await Promise.all([
-      fetch(`${API}?gid=${GID1}`).then(r=>r.json()),
-      fetch(`${API}?gid=${GID2}`).then(r=>r.json()),
+      fetch(`${API}?gid=${GID1}&t=${t}`,{cache:'no-store'}).then(r=>r.json()),
+      fetch(`${API}?gid=${GID2}&t=${t}`,{cache:'no-store'}).then(r=>r.json()),
       postAPI({action:'getMemos'}).catch(()=>({ok:false})),
     ]);
     raw1=j1.data||[];raw2=j2.data||[];
