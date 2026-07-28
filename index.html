@@ -874,7 +874,26 @@ function renderTab2(p2,p1){
     backgroundColor:'rgba(17,17,17,0.88)',titleFont:{size:10,family:'Inter'},bodyFont:{size:10,family:'Inter'},cornerRadius:8,padding:8,
     mode:'index',intersect:false,
     filter(item){return item.raw!==null&&item.raw!==undefined;},
-    callbacks:{label(ctx){const v=ctx.raw;if(v===null||v===undefined)return null;return ` ${ctx.dataset.label}: ${fNum(v)}건`;}}
+    callbacks:{
+      label(ctx){const v=ctx.raw;if(v===null||v===undefined)return null;return ` ${ctx.dataset.label}: ${fNum(v)}건`;},
+      afterBody(items){
+        const m=(items[0]?.dataIndex??0)+1;
+        const curYtdRv=rvD2.slice(0,m).reduce((s,v)=>s+(v||0),0);
+        const prevYtdRv=prevRv2.slice(0,m).reduce((s,v)=>s+(v||0),0);
+        const curYtdNeg=cur.filter(r=>r.month<=m).length;
+        const prevYtdNeg=prev.filter(r=>r.month<=m).length;
+        const curRate=curYtdRv>0?curYtdNeg/curYtdRv*100:0;
+        const prevRate=prevYtdRv>0?prevYtdNeg/prevYtdRv*100:0;
+        const diff=prevRate-curRate;
+        const diffStr=diff>=0?`${diff.toFixed(1)}%p 감소`:`${Math.abs(diff).toFixed(1)}%p 증가`;
+        return [
+          '',
+          ` ${selYear}년 누적 리뷰수: ${fNum(curYtdRv)}건`,
+          ` ${selYear-1}년 누적 리뷰수: ${fNum(prevYtdRv)}건`,
+          ` 전년비 연 부정리뷰: ${diffStr}`,
+        ];
+      }
+    }
   }}}});
 
   // c5
