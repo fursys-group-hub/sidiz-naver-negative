@@ -124,7 +124,9 @@ body{background:var(--bg);min-height:100vh}
 /* 리뷰 메모 슬라이드 */
 .rv-memo-row{background:#F8FAFF;border-top:1px solid #EEF0F8}
 .rv-memo-inner{padding:10px 14px;display:flex;flex-direction:column;gap:6px}
-.rv-memo-textarea{width:100%;min-height:56px;border:1px solid #DDEEFF;border-radius:8px;padding:8px 10px;font-size:11px;font-family:inherit;color:#333;resize:none;outline:none;line-height:1.7;background:#fff}
+.rv-memo-textarea{width:100%;min-height:56px;border:1px solid #DDEEFF;border-radius:8px;padding:8px 10px;font-size:11px;font-family:inherit;color:#333;resize:none;outline:none;line-height:1.7;background:#fff;overflow:hidden}
+.rv-photo-link{color:#3366CC;font-weight:700;cursor:pointer;text-decoration:underline}
+.rv-photo-link:hover{color:#1A4FBF}
 .rv-memo-textarea:focus{border-color:#99BBFF}
 .rv-memo-btns{display:flex;justify-content:flex-end;gap:6px;align-items:center}
 .rv-memo-save{padding:4px 12px;border-radius:7px;border:1px solid #99BBFF;background:#EEF4FF;font-size:10px;font-weight:600;color:#3366CC;cursor:pointer;font-family:inherit}
@@ -609,7 +611,7 @@ function parseTab2(){
     const prodName=String(r['상품명']||'');
     const{category,model}=classifyProduct(prodName);
     return{year:parseInt(p[0]),month:parseInt(p[1]),date:d,prodName,rating,content,help,
-      hasPhoto,orderId,score,level:scoreLevel(score),bd,category,model};
+      hasPhoto,photoLink,orderId,score,level:scoreLevel(score),bd,category,model};
   }).filter(Boolean);
 }
 function calcScore(r,h,rel,len,photo=false){
@@ -1137,6 +1139,8 @@ function renderRvTable(){
     const sl=r.level;
     const memo=_reviewMemos[r.orderId]||'';
     const hasMemo=memo.length>0;
+    const memoDefault='■ 수주번호 : \n■ 고객명 : \n■ 불만 사유 : ';
+    const memoValue=memo||memoDefault;
     const rowId=`rv_${i}`;
     return`<tr id="tr_${rowId}">
       <td>${i+1}</td>
@@ -1144,7 +1148,7 @@ function renderRvTable(){
       <td class="score-cell" data-bd="평점 +${r.bd.r} · 도움수 +${r.bd.h} · 관련리뷰 +${r.bd.rel} · 글자수 +${r.bd.len} · 포토 +${r.bd.photo}">${r.score}</td>
       <td><span class="rv-pill" style="background:${sl.bg};color:${sl.color}">${sl.lv}</span></td>
       <td>${r.help}</td>
-      <td style="text-align:center">${r.hasPhoto?'O':''}</td>
+      <td style="text-align:center">${r.hasPhoto?`<span class="rv-photo-link" onclick='window.open("${r.photoLink.replace(/"/g,'&quot;').replace(/'/g,'%27')}","_blank")' title="사진/영상 보기">O</span>`:''}</td>
       <td style="font-size:10px">${r.orderId?`<span onclick="copyOrderId(this,'${r.orderId}')" style="cursor:pointer;color:#888;border-radius:5px;padding:2px 4px;transition:background .12s" onmouseenter="this.style.background='#F0F0F0'" onmouseleave="this.style.background='transparent'" title="클릭하여 복사">${r.orderId}</span>`:'-'}</td>
       <td>${r.content}</td>
       <td>${r.model}</td>
@@ -1154,7 +1158,7 @@ function renderRvTable(){
     <tr id="memo_${rowId}" class="rv-memo-row" style="display:none">
       <td colspan="11">
         <div class="rv-memo-inner">
-          <textarea class="rv-memo-textarea" id="mta_${rowId}" placeholder="해당 리뷰 확인 내용을 메모하세요...">${memo}</textarea>
+          <textarea class="rv-memo-textarea" id="mta_${rowId}" placeholder="해당 리뷰 확인 내용을 메모하세요..." oninput="autoResizeTextarea(this)">${memoValue}</textarea>
           <div class="rv-memo-btns">
             <span class="rv-memo-saved" id="msaved_${rowId}" style="display:none">✓ 저장됨</span>
             <button class="rv-memo-save" onclick="saveRvMemo('${rowId}','${(r.orderId||'').replace(/'/g,"\'")}')">저장</button>
@@ -1165,12 +1169,21 @@ function renderRvTable(){
   }).join('');
 }
 
+function autoResizeTextarea(el){
+  if(!el) return;
+  el.style.height='auto';
+  el.style.height=el.scrollHeight+'px';
+}
 function toggleRvMemo(rowId,orderId,btn){
   const memoRow=document.getElementById('memo_'+rowId);
   if(!memoRow) return;
   const isOpen=memoRow.style.display!=='none';
   memoRow.style.display=isOpen?'none':'table-row';
-  if(!isOpen) document.getElementById('mta_'+rowId)?.focus();
+  if(!isOpen){
+    const ta=document.getElementById('mta_'+rowId);
+    ta?.focus();
+    autoResizeTextarea(ta);
+  }
 }
 
 async function saveRvMemo(rowId,orderId){
