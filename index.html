@@ -55,6 +55,11 @@ body{background:var(--bg);min-height:100vh}
 .leg{display:flex;gap:10px;margin-bottom:7px;flex-wrap:wrap}
 .li{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--g2)}
 .lr{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.rtb{border:1px solid #E4E0DC;background:#fff;border-radius:999px;padding:4px 10px;cursor:pointer;font-family:inherit;transition:all .15s}
+.rtb .lr{width:10px;height:10px;border-radius:3px}
+.rtb b{font-weight:600;color:#1E2430;margin-left:2px}
+.rtb.on{border-color:#1E2430;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.rtb.off{opacity:.4}
 .ll{width:12px;height:2px;border-radius:1px;flex-shrink:0}
 .la{width:14px;height:8px;border-radius:2px;flex-shrink:0;opacity:.3}
 /* 도넛 - 두께 16 (기존 11 → 1.5배) */
@@ -297,6 +302,13 @@ body{background:#D9DEE6;padding:28px}
             <div class="li"><div class="lr" style="background:#D3D6DC"></div><span id="rlblPrev">전년 동주차</span></div>
           </div>
           <div style="position:relative;height:175px"><canvas id="c4"></canvas></div>
+        </div>
+
+        <!-- 리뷰 유형 비중 (주차별) -->
+        <div class="cc">
+          <div class="ctit">리뷰 유형 비중</div><div class="csub" id="rtsub">-</div>
+          <div class="leg" id="rtleg"></div>
+          <div style="position:relative;height:175px"><canvas id="c4t"></canvas></div>
         </div>
 
         <!-- 구매자수 -->
@@ -843,8 +855,62 @@ function renderTab1(p1){
     }
   }},scales:{...bO.scales,x:{...bO.scales.x,ticks:{...bO.scales.x.ticks,maxRotation:0,autoSkip:true,autoSkipPadding:6}}}}});
 
+  rtWk=wk;
+  drawReviewTypes();
+
   // 메모 불러오기 (월/연도 변경 시마다)
   loadMemo();
+}
+
+// c4t: 리뷰 유형 비중 (주차별 100% 누적 막대, 범례 클릭 시 해당 유형만 강조)
+const RT=[
+  {key:'photo',label:'포토리뷰',color:'#C9A38A'},
+  {key:'text',label:'텍스트리뷰',color:'#E6D3C2'},
+  {key:'video',label:'동영상리뷰',color:'#7E655A'},
+];
+let rtWk=[],rtSel=null;
+function hexA(h,a){const n=parseInt(h.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`;}
+function pickReviewType(k){rtSel=rtSel===k?null:k;drawReviewTypes();}
+function drawReviewTypes(){
+  const wk=rtWk;
+  const sum=w=>w.photo+w.video+w.text;
+  const pct=(w,k)=>sum(w)?w[k]/sum(w)*100:0;
+  const tot={};RT.forEach(t=>tot[t.key]=wk.reduce((s,w)=>s+w[t.key],0));
+  const all=RT.reduce((s,t)=>s+tot[t.key],0);
+  document.getElementById('rtsub').textContent=wk.length
+    ?`주차별 포토 · 텍스트 · 동영상 리뷰 비중 · 범례를 누르면 해당 유형만 강조됩니다`
+    :`${selYear}년 주차별 리뷰 데이터가 없습니다`;
+  document.getElementById('rtleg').innerHTML=RT.map(t=>
+    `<button class="li rtb${rtSel===t.key?' on':rtSel?' off':''}" onclick="pickReviewType('${t.key}')">`+
+    `<div class="lr" style="background:${t.color}"></div>${t.label}<b>${all?(tot[t.key]/all*100).toFixed(1):0}%</b></button>`).join('');
+  const valLabel={id:'rtLabel',afterDatasetsDraw(chart){
+    if(!rtSel) return;
+    const di=RT.findIndex(t=>t.key===rtSel),meta=chart.getDatasetMeta(di),c=chart.ctx;
+    c.save();c.font='600 9px Inter,sans-serif';c.textAlign='center';
+    meta.data.forEach((el,i)=>{
+      const v=pct(wk[i],rtSel);if(!v) return;
+      const h=el.base-el.y,inside=h>14;
+      c.fillStyle=inside&&rtSel==='video'?'#fff':'#1E2430';
+      c.textBaseline=inside?'middle':'bottom';
+      c.fillText((v<1?v.toFixed(1):Math.round(v))+'%',el.x,inside?el.y+h/2:el.y-2);
+    });
+    c.restore();
+  }};
+  mkC('c4t',{type:'bar',plugins:[valLabel],data:{labels:wk.map(w=>w.label),datasets:RT.map(t=>({
+    label:t.label,data:wk.map(w=>pct(w,t.key)),barPercentage:0.75,borderRadius:2,
+    backgroundColor:!rtSel||rtSel===t.key?t.color:hexA(t.color,0.15),
+  }))},options:{...bO,layout:{padding:{top:12}},
+    onClick(e,els){if(els.length) pickReviewType(RT[els[0].datasetIndex].key);},
+    onHover(e,els){e.native.target.style.cursor=els.length?'pointer':'default';},
+    plugins:{...bO.plugins,tooltip:{...bO.plugins.tooltip,mode:'index',intersect:false,
+      callbacks:{
+        title(items){const w=wk[items[0].dataIndex];return `${w.month}월 ${w.week}주차 · 총 ${fNum(sum(w))}건`;},
+        label(ctx){const t=RT[ctx.datasetIndex],w=wk[ctx.dataIndex];
+          return ` ${t.label}: ${fNum(w[t.key])}건 (${pct(w,t.key).toFixed(1)}%)`;},
+        labelColor(ctx){const c=RT[ctx.datasetIndex].color;return{borderColor:c,backgroundColor:c};},
+      }}},
+    scales:{x:{...bO.scales.x,stacked:true,ticks:{...bO.scales.x.ticks,maxRotation:0,autoSkip:true,autoSkipPadding:6}},
+      y:{...bO.scales.y,stacked:true,max:100,ticks:{...bO.scales.y.ticks,stepSize:25,callback:v=>v+'%'}}}}});
 }
 
 // ===== 탭2 =====
