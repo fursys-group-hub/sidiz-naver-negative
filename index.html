@@ -294,6 +294,7 @@ body{background:#D9DEE6;padding:28px}
           <div class="leg">
             <div class="li"><div class="lr" style="background:#111"></div>주차별 총 리뷰</div>
             <div class="li"><div class="lr" style="background:#FFD66B"></div><span id="rlblSel">선택 월</span></div>
+            <div class="li"><div class="lr" style="background:#D3D6DC"></div><span id="rlblPrev">전년 동주차</span></div>
           </div>
           <div style="position:relative;height:175px"><canvas id="c4"></canvas></div>
         </div>
@@ -482,7 +483,7 @@ body{background:#D9DEE6;padding:28px}
 <script>
 const API='https://script.google.com/macros/s/AKfycbznkgGbPy4HRNXpx73yMzmZlbQScriTcHjWKo5j9pxdCkMCu6X1F8ABIz0tuKT-N_4OUA/exec';
 const GID1='543240057',GID2='1006983265',GID3='441690341';
-const GID4='1427547409',WEEK_YEAR=2026; // 주차별 리뷰수 시트 (연도 표기 없이 2026년 기준으로 기록 중)
+const GID4='1427547409',WEEK_YEAR=2026; // 주차별 리뷰수 시트 (연도 칸이 비어 있으면 2026년으로 간주)
 const Y='#FFD66B';
 const CHART_COLORS=['#4A90D9','#D93030','#1A8A5A','#A07000','#8B5CF6','#06B6D4','#F97316','#EC4899','#6366F1','#14B8A6'];
 const _now=new Date();
@@ -625,7 +626,8 @@ function parseWeekly(){
   return raw4.map(r=>{
     const m=String(r['주차']||'').match(/(\d+)\s*월\s*(\d+)\s*주차/);
     if(!m) return null;
-    return{year:WEEK_YEAR,month:parseInt(m[1]),week:parseInt(m[2]),label:`${m[1]}월 ${m[2]}주`,
+    const y=parseInt(String(r['연도']||'').match(/\d{4}/)?.[0])||WEEK_YEAR;
+    return{year:y,month:parseInt(m[1]),week:parseInt(m[2]),label:`${m[1]}월 ${m[2]}주`,
       total:toN(r['총 리뷰']),normal:toN(r['일반리뷰']),month1:toN(r['한달사용리뷰']),
       photo:toN(r['포토리뷰']),video:toN(r['동영상리뷰']),text:toN(r['텍스트리뷰'])};
   }).filter(Boolean);
@@ -805,26 +807,35 @@ function renderTab1(p1){
     }}
   }}}});
 
-  // c4: 리뷰수 (주차별 막대, 선택 월 강조)
-  const wk=selYear===WEEK_YEAR?parseWeekly():[];
+  // c4: 리뷰수 (주차별 막대, 선택 월 강조, 전년 동주차는 뒤에 회색 그림자 막대)
+  const allWk=parseWeekly();
+  const wk=allWk.filter(w=>w.year===selYear);
+  const pwk=wk.map(w=>allWk.find(p=>p.year===selYear-1&&p.month===w.month&&p.week===w.week)||null);
+  const hasPrev=pwk.some(Boolean);
   const selM=selMonth;
   document.getElementById('rsub').textContent=wk.length
-    ?`${WEEK_YEAR}년 주차별 총 리뷰 · ${wk[0].label} ~ ${wk[wk.length-1].label}`
-    :`주차별 리뷰 데이터는 ${WEEK_YEAR}년만 있습니다`;
+    ?`${selYear}년 주차별 총 리뷰 · ${wk[0].label} ~ ${wk[wk.length-1].label}`
+    :`${selYear}년 주차별 리뷰 데이터가 없습니다`;
   document.getElementById('rlblSel').textContent=selM?`${selM}월`:'선택 월';
+  document.getElementById('rlblPrev').parentElement.style.display=hasPrev?'':'none';
+  document.getElementById('rlblPrev').textContent=`${selYear-1}년 동주차`;
   mkC('c4',{type:'bar',data:{labels:wk.map(w=>w.label),datasets:[
-    {label:'총 리뷰',data:wk.map(w=>w.total),borderRadius:4,barPercentage:0.7,
+    {label:'총 리뷰',data:wk.map(w=>w.total),borderRadius:4,barPercentage:0.6,grouped:false,order:1,
      backgroundColor:wk.map(w=>selM&&w.month===selM?Y:'#111'),
      _showLabel:true,_fmt:v=>v?fNum(v):''},
+    {label:'전년 동주차',data:pwk.map(p=>p?p.total:null),borderRadius:4,barPercentage:0.92,grouped:false,order:2,
+     backgroundColor:'rgba(160,166,178,0.35)'},
   ]},options:{...bO,layout:{padding:{top:14}},plugins:{...bO.plugins,tooltip:{
     backgroundColor:'rgba(17,17,17,0.88)',titleFont:{size:10,family:'Inter'},bodyFont:{size:10,family:'Inter'},cornerRadius:8,padding:8,
     mode:'index',intersect:false,displayColors:false,
     callbacks:{
       title(items){const w=wk[items[0].dataIndex];return `${w.month}월 ${w.week}주차`;},
       label(ctx){
-        const i=ctx.dataIndex,w=wk[i],p=wk[i-1];
+        if(ctx.datasetIndex!==0) return null;
+        const i=ctx.dataIndex,w=wk[i],p=wk[i-1],py=pwk[i];
         const lines=[` 총 리뷰: ${fNum(w.total)}건`];
         if(p&&p.total) {const d=(w.total-p.total)/p.total*100;lines.push(` 전주 대비: ${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(1)}%`);}
+        if(py&&py.total) {const d=(w.total-py.total)/py.total*100;lines.push(` 전년 동주차: ${fNum(py.total)}건 (${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(1)}%)`);}
         lines.push(` 일반 ${fNum(w.normal)} · 한달사용 ${fNum(w.month1)}`);
         lines.push(` 포토 ${fNum(w.photo)} · 동영상 ${fNum(w.video)} · 텍스트 ${fNum(w.text)}`);
         return lines;
