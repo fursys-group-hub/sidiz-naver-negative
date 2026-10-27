@@ -147,45 +147,82 @@ body{background:var(--bg);min-height:100vh}
 .score-cell{position:relative;cursor:help;white-space:nowrap}
 .score-cell::after{content:attr(data-bd);display:none;position:absolute;left:50%;transform:translateX(-50%);top:calc(100% + 5px);background:#1A1A1A;color:#F0F0F0;font-size:10px;line-height:1.9;padding:7px 12px;border-radius:9px;white-space:nowrap;z-index:300;box-shadow:0 4px 16px rgba(0,0,0,0.22);pointer-events:none}
 .score-cell:hover::after{display:block}
+
+/* ===== 레이아웃 리디자인 ===== */
+:root{--bg:#E3E7EE;--dark:#1E2430;--g2:#8A909C;--g4:#F1F3F6;--r:26px;
+  --sh:0 10px 30px rgba(30,40,60,.06),0 1px 2px rgba(30,40,60,.04);--sh2:0 16px 40px rgba(30,40,60,.10)}
+body{background:#D9DEE6;padding:28px}
+.wrap{display:block;max-width:1640px;margin:0 auto;background:#EEF0F4;border-radius:36px;padding:22px 30px 34px;box-shadow:0 30px 80px rgba(30,40,60,.12);min-height:auto}
+.tnav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:4px 0 18px;flex-wrap:wrap}
+.tnav-l{display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;letter-spacing:.6px;color:var(--dark)}
+.brand-mark{width:32px;height:32px;border-radius:50%;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
+.tabs{display:flex;gap:4px;background:#fff;padding:5px;border-radius:99px;box-shadow:var(--sh)}
+.nb{display:flex;flex-direction:row;align-items:center;gap:7px;width:auto;padding:9px 18px;border-radius:99px;border:none;background:none;color:#6B7280;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:inherit}
+.nb:hover{color:var(--dark);background:#F3F4F6}
+.nb.on{background:var(--dark);color:#fff}
+.nb.on::before{display:none}
+.nb svg{width:17px;height:17px;flex-shrink:0}
+.hbtns{display:flex;align-items:center;gap:8px}
+.upd{font-size:11px;color:var(--g2);margin-right:6px}
+.hbtn{width:40px;height:40px;border-radius:50%;border:none;background:#fff;color:var(--dark);box-shadow:var(--sh)}
+.hbtn svg{width:17px;height:17px}
+.hbtn:hover{background:var(--dark);color:#fff}
+.main{margin-left:0;overflow:visible}
+.hero{padding:10px 4px 2px}
+.page-title{font-size:40px;font-weight:300;letter-spacing:-1.6px;color:var(--dark);line-height:1.15}
+.page-sub{font-size:12px;color:var(--g2);margin-top:6px}
+.content{padding:16px 0 0;gap:18px}
+.pg.on{gap:18px}
+.fblock{border-radius:var(--r);padding:16px 22px;gap:8px;box-shadow:var(--sh)}
+.flbl{font-size:11px;width:34px}
+.fp{padding:6px 16px;font-size:12px;background:transparent;border:1px solid #E3E6EB;color:#C3C7CF}
+.fp.has-data{background:#F4F5F8;border-color:#F4F5F8;color:#4B5160}
+.fp.on{background:var(--dark);border-color:var(--dark);color:#fff;box-shadow:0 4px 12px rgba(30,36,48,.25)}
+.fp.yon{border-color:var(--y)}
+.kgrid6,.kgrid3{gap:14px}
+.kc{border:none;border-radius:var(--r);padding:20px 22px;box-shadow:var(--sh)}
+.k-lbl{font-size:11px}
+.k-val{font-size:30px;font-weight:300;letter-spacing:-1.2px;margin:6px 0 8px}
+.cc{border:none;border-radius:var(--r);padding:24px 26px;box-shadow:var(--sh)}
+.ctit{font-size:20px;font-weight:400;letter-spacing:-.6px;margin-bottom:4px}
+.csub{font-size:11px;margin-bottom:12px}
+.li{font-size:11px}
+.cgrid2,.cgridd{gap:18px}
+.cgridd{grid-template-columns:240px 1fr}
+.topN-card{background:#F6F7F9;border:none;border-radius:18px}
+.grade-info,.score-filter,.filter-box{background:#F6F7F9;border-color:#ECEEF2;border-radius:14px}
+.ddbtn,.rv-dd-btn{border-radius:99px;background:#fff}
+.excel-btn{border-radius:50%;border:none}
+@media(max-width:900px){
+  body{padding:10px}.wrap{padding:16px;border-radius:24px}
+  .tnav-l{gap:12px}.nb{padding:8px 12px;font-size:12px}
+  .page-title{font-size:26px}
+  .kgrid6{grid-template-columns:repeat(2,1fr)}.cgrid2,.cgridd{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="sb">
-    <div class="sb-logo">S</div>
-    <button class="nb on" onclick="sw(1)" id="n1">
-      <span class="nb-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="24" height="24" rx="5" fill="#03C75A"/>
-          <path d="M6 18V6h2.8l4.4 7.2V6H16v12h-2.8L8.8 10.8V18H6z" fill="white"/>
-        </svg>
-      </span>
-      <span class="nb-txt">네이버<br>실적</span>
-    </button>
-    <button class="nb" onclick="sw(2)" id="n2">
-      <span class="nb-icon">💬</span>
-      <span class="nb-txt">부정<br>리뷰</span>
-    </button>
-    <button class="nb" onclick="sw(3)" id="n3">
-      <span class="nb-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="24" height="24" rx="5" fill="#03C75A"/>
-          <polyline points="4,17 9,11 13,14 20,7" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </span>
-      <span class="nb-txt">N<br>쿼리수</span>
-    </button>
-  </div>
+  <header class="tnav">
+    <div class="tnav-l">
+      <div class="brand"><span class="brand-mark">S</span><span>SIDIZ</span></div>
+      <nav class="tabs">
+        <button class="nb on" onclick="sw(1)" id="n1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><rect x="5.5" y="11" width="3" height="6" rx="1"/><rect x="10.5" y="6" width="3" height="11" rx="1"/><rect x="15.5" y="9" width="3" height="8" rx="1"/></svg><span>네이버 실적</span></button>
+        <button class="nb" onclick="sw(2)" id="n2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a7.5 7.5 0 0 1-10.9 6.7L4 20l1.4-4.4A7.5 7.5 0 1 1 20 12z"/><path d="M12 8.5v4"/><path d="M12 15.5h.01"/></svg><span>부정 리뷰</span></button>
+        <button class="nb" onclick="sw(3)" id="n3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/><path d="M7.5 12l2-2 1.5 1.5L13.5 9"/></svg><span>N 쿼리수</span></button>
+      </nav>
+    </div>
+    <div class="hbtns">
+      <span class="upd" id="last-updated">데이터 불러오는 중...</span>
+      <button class="hbtn" onclick="fetchAll()" title="새로고침"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button>
+      <a class="hbtn" href="https://docs.google.com/spreadsheets/d/1UyoOkvJMY8kTLAZzjw6PoYw6J_YWrfakcP9iEvCUrQs" target="_blank" title="원본 시트"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
+    </div>
+  </header>
   <div class="main">
-    <div class="topbar">
-      <div>
-        <div class="page-title" id="ptit">SIDIZ 네이버 실적 대시보드</div>
-        <div class="page-sub" id="last-updated">데이터 불러오는 중...</div>
-      </div>
-      <div class="hbtns">
-        <button class="hbtn" onclick="fetchAll()" title="새로고침">↺</button>
-        <a class="hbtn" href="https://docs.google.com/spreadsheets/d/1UyoOkvJMY8kTLAZzjw6PoYw6J_YWrfakcP9iEvCUrQs" target="_blank" title="원본 시트" style="font-size:10px">↗</a>
-      </div>
+    <div class="hero">
+      <h1 class="page-title" id="ptit">SIDIZ 네이버 실적 대시보드</h1>
+      <div class="page-sub">네이버 스마트스토어 실적 · 리뷰 · 검색 쿼리 현황</div>
     </div>
 
     <!-- 탭1 -->
@@ -251,34 +288,24 @@ body{background:var(--bg);min-height:100vh}
           </div>
         </div>
 
-        <!-- 리뷰수 추이 (위로) -->
+        <!-- 리뷰수 추이 (주차별) -->
         <div class="cc">
           <div class="ctit">리뷰수 추이</div><div class="csub" id="rsub">-</div>
           <div class="leg">
-            <div class="li"><div class="ll" style="background:#111"></div><span id="rlbl1">올해</span></div>
-            <div class="li"><div style="width:14px;height:0;border-top:1.5px dashed #555;flex-shrink:0"></div><span id="rlbl2">전년</span></div>
+            <div class="li"><div class="lr" style="background:#111"></div>주차별 총 리뷰</div>
+            <div class="li"><div class="lr" style="background:#FFD66B"></div><span id="rlblSel">선택 월</span></div>
           </div>
-          <div style="position:relative;height:135px"><canvas id="c4"></canvas></div>
+          <div style="position:relative;height:175px"><canvas id="c4"></canvas></div>
         </div>
 
-        <!-- 구매자수 + 환불 (아래로) -->
-        <div class="cgrid2">
-          <div class="cc">
-            <div class="ctit">구매자수 추이</div><div class="csub" id="bsub">-</div>
-            <div class="leg">
-              <div class="li"><div class="ll" style="background:#111"></div><span id="blbl1">올해</span></div>
-              <div class="li"><div style="width:14px;height:0;border-top:1.5px dashed #555;flex-shrink:0"></div><span id="blbl2">전년</span></div>
-            </div>
-            <div style="position:relative;height:145px"><canvas id="c2"></canvas></div>
+        <!-- 구매자수 -->
+        <div class="cc">
+          <div class="ctit">구매자수 추이</div><div class="csub" id="bsub">-</div>
+          <div class="leg">
+            <div class="li"><div class="lr" style="background:#111"></div><span id="blbl1">올해</span></div>
+            <div class="li"><div style="width:14px;height:0;border-top:1.5px dashed #999;flex-shrink:0"></div><span id="blbl2">전년</span></div>
           </div>
-          <div class="cc">
-            <div class="ctit">환불 추이</div><div class="csub">환불금액(영역) · 환불율%(선, 커서로 상세확인)</div>
-            <div class="leg">
-              <div class="li"><div class="la" style="background:#AAA"></div>금액 범위</div>
-              <div class="li"><div class="ll" style="background:#D93030"></div>환불율%</div>
-            </div>
-            <div style="position:relative;height:145px"><canvas id="c3"></canvas></div>
-          </div>
+          <div style="position:relative;height:145px"><canvas id="c2"></canvas></div>
         </div>
       </div>
     </div>
@@ -295,8 +322,8 @@ body{background:var(--bg);min-height:100vh}
         <div class="cc" style="margin-bottom:11px">
           <div class="ctit">리뷰수 추이</div><div class="csub" id="rsub2">-</div>
           <div class="leg">
-            <div class="li"><div class="ll" style="background:#111"></div>올해</div>
-            <div class="li"><div style="width:14px;height:0;border-top:1.5px dashed #555;flex-shrink:0"></div>전년</div>
+            <div class="li"><div class="lr" style="background:#111"></div>올해</div>
+            <div class="li"><div style="width:14px;height:0;border-top:1.5px dashed #999;flex-shrink:0"></div>전년</div>
           </div>
           <div style="position:relative;height:148px"><canvas id="c4b"></canvas></div>
         </div>
@@ -304,8 +331,8 @@ body{background:var(--bg);min-height:100vh}
           <div class="cc">
             <div class="ctit">총 부정리뷰 추이</div><div class="csub" id="n5sub">-</div>
             <div class="leg">
-              <div class="li"><div class="ll" style="background:#111"></div>올해</div>
-              <div class="li"><div style="width:14px;height:0;border-top:1.5px dashed #555;flex-shrink:0"></div>전년</div>
+              <div class="li"><div class="lr" style="background:#111"></div>올해</div>
+              <div class="li"><div style="width:14px;height:0;border-top:1.5px dashed #999;flex-shrink:0"></div>전년</div>
             </div>
             <div style="position:relative;height:148px"><canvas id="c5"></canvas></div>
           </div>
@@ -455,11 +482,12 @@ body{background:var(--bg);min-height:100vh}
 <script>
 const API='https://script.google.com/macros/s/AKfycbznkgGbPy4HRNXpx73yMzmZlbQScriTcHjWKo5j9pxdCkMCu6X1F8ABIz0tuKT-N_4OUA/exec';
 const GID1='543240057',GID2='1006983265',GID3='441690341';
+const GID4='1427547409',WEEK_YEAR=2026; // 주차별 리뷰수 시트 (연도 표기 없이 2026년 기준으로 기록 중)
 const Y='#FFD66B';
 const CHART_COLORS=['#4A90D9','#D93030','#1A8A5A','#A07000','#8B5CF6','#06B6D4','#F97316','#EC4899','#6366F1','#14B8A6'];
 const _now=new Date();
 const _prevM=_now.getMonth()===0?12:_now.getMonth();
-let raw1=[],raw2=[],raw3=[],selYear=_now.getFullYear(),selMonth=_prevM,charts={};
+let raw1=[],raw2=[],raw3=[],raw4=[],selYear=_now.getFullYear(),selMonth=_prevM,charts={};
 let qCharts={},selYearQ=_now.getFullYear();
 let selC7Prods=[],selRvProds=[],_curMReviews=[],_allYearReviews=[],_scoreMin=0;
 let _fullYear=false,_ratingMin=1; // 올해 전체보기
@@ -553,13 +581,14 @@ Chart.register(labelPlugin);
 async function fetchAll(){
   document.getElementById('last-updated').textContent='데이터 동기화 중...';
   try{
-    const[j1,j2,j3,jm]=await Promise.all([
+    const[j1,j2,j3,j4,jm]=await Promise.all([
       fetch(`${API}?gid=${GID1}`).then(r=>r.json()),
       fetch(`${API}?gid=${GID2}`).then(r=>r.json()),
       fetch(`${API}?gid=${GID3}`).then(r=>r.json()),
+      fetch(`${API}?gid=${GID4}`).then(r=>r.json()).catch(()=>({data:[]})),
       postAPI({action:'getMemos'}).catch(()=>({ok:false})),
     ]);
-    raw1=j1.data||[];raw2=j2.data||[];raw3=j3.data||[];
+    raw1=j1.data||[];raw2=j2.data||[];raw3=j3.data||[];raw4=j4.data||[];
     if(jm.ok&&jm.data){
       _reviewMemos=jm.data.review||{};
       window._monthlyMemos=jm.data.monthly||{};
@@ -590,6 +619,15 @@ function parseTab1(){
       reviews:toN(r['리뷰수']),
       prevERP:toN(r['전년매출']||r['K']),
     };
+  }).filter(Boolean);
+}
+function parseWeekly(){
+  return raw4.map(r=>{
+    const m=String(r['주차']||'').match(/(\d+)\s*월\s*(\d+)\s*주차/);
+    if(!m) return null;
+    return{year:WEEK_YEAR,month:parseInt(m[1]),week:parseInt(m[2]),label:`${m[1]}월 ${m[2]}주`,
+      total:toN(r['총 리뷰']),normal:toN(r['일반리뷰']),month1:toN(r['한달사용리뷰']),
+      photo:toN(r['포토리뷰']),video:toN(r['동영상리뷰']),text:toN(r['텍스트리뷰'])};
   }).filter(Boolean);
 }
 function parseTab2(){
@@ -751,13 +789,12 @@ function renderTab1(p1){
   const buyD=ml.map((_,i)=>cur.find(x=>x.month===i+1)?.buyers||null);
   const prevBuy=ml.map((_,i)=>prev.find(x=>x.month===i+1)?.buyers||null);
   document.getElementById('bsub').textContent=`${selYear}년 / ${selYear-1}년 비교`;
-  mkC('c2',{type:'line',data:{labels:ml,datasets:[
-    {label:`${selYear-1}년`,data:prevBuy,fill:false,tension:0.4,
-     borderColor:'#555',borderWidth:1,borderDash:[5,4],pointRadius:0,order:2},
-    {label:`${selYear}년`,data:buyD,borderColor:'#111',borderWidth:1.5,tension:0.4,
-     pointRadius:2.5,pointBackgroundColor:'#111',fill:false,order:1,
-     _showLabel:true,_fmt:v=>v?fNum(v):''},
-  ]},options:{...bO,plugins:{...bO.plugins,tooltip:{
+  mkC('c2',{type:'bar',data:{labels:ml,datasets:[
+    {label:`${selYear-1}년`,data:prevBuy,type:'line',fill:false,tension:0.4,
+     borderColor:'#999',borderWidth:1.5,borderDash:[5,4],pointRadius:0,order:1},
+    {label:`${selYear}년`,data:buyD,type:'bar',backgroundColor:'#111',borderRadius:5,
+     barPercentage:0.5,order:2,_showLabel:true,_fmt:v=>v?fNum(v):''},
+  ]},options:{...bO,layout:{padding:{top:14}},plugins:{...bO.plugins,tooltip:{
     backgroundColor:'rgba(17,17,17,0.88)',titleFont:{size:10,family:'Inter'},bodyFont:{size:10,family:'Inter'},cornerRadius:8,padding:8,
     mode:'index',intersect:false,
     filter(item){return item.raw!==null&&item.raw!==undefined;},
@@ -768,68 +805,32 @@ function renderTab1(p1){
     }}
   }}}});
 
-  // c3: 환불금액=영역, 환불율%=선, 커서에 환불금액+건수+%모두 툴팁표시 (건수 라인 제거)
-  const refAmtD=ml.map((_,i)=>cur.find(x=>x.month===i+1)?.refundAmt||null);
-  const refCntD=ml.map((_,i)=>cur.find(x=>x.month===i+1)?.refundCnt||null);
-  const refRateD=ml.map((_,i)=>cur.find(x=>x.month===i+1)?.refRate||null);
-  mkC('c3',{type:'line',data:{labels:ml,datasets:[
-    {label:'환불금액',data:refAmtD,fill:true,tension:0.4,
-     borderColor:'rgba(150,150,150,0.35)',borderWidth:1,pointRadius:0,
-     backgroundColor:ctx=>makeGrad(ctx,150,150,150,0.18,0.01),yAxisID:'y',order:3},
-    // 환불건수: 숨김(pointRadius0, borderWidth0) 툴팁에만 표시
-    {label:'환불건수',data:refCntD,fill:false,tension:0.4,
-     borderColor:'transparent',borderWidth:0,pointRadius:0,
-     yAxisID:'y',order:2},
-    {label:'환불율%',data:refRateD,fill:false,tension:0.4,
-     borderColor:'#D93030',borderWidth:1.5,pointRadius:2.5,pointBackgroundColor:'#D93030',
-     yAxisID:'y2',order:1,_showLabel:true,_fmt:v=>v?v.toFixed(1)+'%':''},
-  ]},options:{...bO,
-    plugins:{...bO.plugins,
-      tooltip:{
-        backgroundColor:'rgba(17,17,17,0.88)',
-        titleFont:{size:10,family:'Inter'},bodyFont:{size:10,family:'Inter'},
-        cornerRadius:8,padding:8,
-        callbacks:{
-          label(ctx){
-            const ds=ctx.dataset,v=ctx.raw;
-            if(ds.label==='환불금액') return ` 금액: ${v?f억(v):'-'}`;
-            if(ds.label==='환불건수') return ` 건수: ${v?v+'건':'-'}`;
-            if(ds.label==='환불율%') return ` 환불율: ${v?v.toFixed(1)+'%':'-'}`;
-            return '';
-          },
-          // 같은 인덱스의 모든 데이터셋 묶어서 표시
-          title(items){return items[0]?.label||'';}
-        },
-        mode:'index',intersect:false,
-      }
-    },
-    scales:{
-      x:{grid:{display:false},ticks:{font:{size:9,family:'Inter'},color:'#AAA'},border:{display:false}},
-      y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:9,family:'Inter'},color:'#AAA'},border:{display:false},position:'left'},
-      y2:{grid:{display:false},ticks:{font:{size:9,family:'Inter'},color:'#D93030',callback:v=>v+'%'},border:{display:false},position:'right'},
-    }
-  }});
-
-  // c4: 리뷰수
-  const rvD=ml.map((_,i)=>cur.find(x=>x.month===i+1)?.reviews||null);
-  const prevRv=ml.map((_,i)=>prev.find(x=>x.month===i+1)?.reviews||null);
-  document.getElementById('rsub').textContent=`${selYear}년 / ${selYear-1}년 비교`;
-  mkC('c4',{type:'line',data:{labels:ml,datasets:[
-    {label:`${selYear-1}년`,data:prevRv,fill:false,tension:0.4,
-     borderColor:'#555',borderWidth:1,borderDash:[5,4],pointRadius:0,order:2},
-    {label:`${selYear}년`,data:rvD,borderColor:'#111',borderWidth:1.5,tension:0.4,
-     pointRadius:2.5,pointBackgroundColor:'#111',fill:false,order:1,
+  // c4: 리뷰수 (주차별 막대, 선택 월 강조)
+  const wk=selYear===WEEK_YEAR?parseWeekly():[];
+  const selM=selMonth;
+  document.getElementById('rsub').textContent=wk.length
+    ?`${WEEK_YEAR}년 주차별 총 리뷰 · ${wk[0].label} ~ ${wk[wk.length-1].label}`
+    :`주차별 리뷰 데이터는 ${WEEK_YEAR}년만 있습니다`;
+  document.getElementById('rlblSel').textContent=selM?`${selM}월`:'선택 월';
+  mkC('c4',{type:'bar',data:{labels:wk.map(w=>w.label),datasets:[
+    {label:'총 리뷰',data:wk.map(w=>w.total),borderRadius:4,barPercentage:0.7,
+     backgroundColor:wk.map(w=>selM&&w.month===selM?Y:'#111'),
      _showLabel:true,_fmt:v=>v?fNum(v):''},
-  ]},options:{...bO,plugins:{...bO.plugins,tooltip:{
+  ]},options:{...bO,layout:{padding:{top:14}},plugins:{...bO.plugins,tooltip:{
     backgroundColor:'rgba(17,17,17,0.88)',titleFont:{size:10,family:'Inter'},bodyFont:{size:10,family:'Inter'},cornerRadius:8,padding:8,
-    mode:'index',intersect:false,
-    filter(item){return item.raw!==null&&item.raw!==undefined;},
-    callbacks:{label(ctx){
-      const v=ctx.raw,l=ctx.dataset.label;
-      if(v===null||v===undefined) return null;
-      return ` ${l}: ${fNum(v)}건`;
-    }}
-  }}}});
+    mode:'index',intersect:false,displayColors:false,
+    callbacks:{
+      title(items){const w=wk[items[0].dataIndex];return `${w.month}월 ${w.week}주차`;},
+      label(ctx){
+        const i=ctx.dataIndex,w=wk[i],p=wk[i-1];
+        const lines=[` 총 리뷰: ${fNum(w.total)}건`];
+        if(p&&p.total) {const d=(w.total-p.total)/p.total*100;lines.push(` 전주 대비: ${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(1)}%`);}
+        lines.push(` 일반 ${fNum(w.normal)} · 한달사용 ${fNum(w.month1)}`);
+        lines.push(` 포토 ${fNum(w.photo)} · 동영상 ${fNum(w.video)} · 텍스트 ${fNum(w.text)}`);
+        return lines;
+      }
+    }
+  }},scales:{...bO.scales,x:{...bO.scales.x,ticks:{...bO.scales.x.ticks,maxRotation:0,autoSkip:true,autoSkipPadding:6}}}}});
 
   // 메모 불러오기 (월/연도 변경 시마다)
   loadMemo();
@@ -866,13 +867,12 @@ function renderTab2(p2,p1){
   const rvD2=ml.map((_,i)=>p1ForRv.find(x=>x.month===i+1)?.reviews||null);
   const prevRv2=ml.map((_,i)=>p1PrevForRv.find(x=>x.month===i+1)?.reviews||null);
   document.getElementById('rsub2').textContent=`${selYear}년 / ${selYear-1}년 비교`;
-  mkC('c4b',{type:'line',data:{labels:ml,datasets:[
-    {label:`${selYear-1}년`,data:prevRv2,fill:false,tension:0.4,
-     borderColor:'#555',borderWidth:1,borderDash:[5,4],pointRadius:0,order:2},
-    {label:`${selYear}년`,data:rvD2,borderColor:'#111',borderWidth:1.5,tension:0.4,
-     pointRadius:2.5,pointBackgroundColor:'#111',fill:false,order:1,
-     _showLabel:true,_fmt:v=>v?fNum(v):''},
-  ]},options:{...bO,plugins:{...bO.plugins,tooltip:{
+  mkC('c4b',{type:'bar',data:{labels:ml,datasets:[
+    {label:`${selYear-1}년`,data:prevRv2,type:'line',fill:false,tension:0.4,
+     borderColor:'#999',borderWidth:1.5,borderDash:[5,4],pointRadius:0,order:1},
+    {label:`${selYear}년`,data:rvD2,type:'bar',backgroundColor:'#111',borderRadius:5,
+     barPercentage:0.5,order:2,_showLabel:true,_fmt:v=>v?fNum(v):''},
+  ]},options:{...bO,layout:{padding:{top:14}},plugins:{...bO.plugins,tooltip:{
     backgroundColor:'rgba(17,17,17,0.88)',titleFont:{size:10,family:'Inter'},bodyFont:{size:10,family:'Inter'},cornerRadius:8,padding:8,
     mode:'index',intersect:false,
     filter(item){return item.raw!==null&&item.raw!==undefined;},
@@ -905,13 +905,12 @@ function renderTab2(p2,p1){
   const negD=ml.map((_,i)=>cur.filter(r=>r.month===i+1).length||null);
   const prevNeg=ml.map((_,i)=>prev.filter(r=>r.month===i+1).length||null);
   document.getElementById('n5sub').textContent=`${selYear}년 / ${selYear-1}년 비교`;
-  mkC('c5',{type:'line',data:{labels:ml,datasets:[
-    {label:`${selYear-1}년`,data:prevNeg,fill:false,tension:0.4,
-     borderColor:'#555',borderWidth:1,borderDash:[5,4],pointRadius:0,order:2},
-    {label:`${selYear}년`,data:negD,borderColor:'#111',borderWidth:1.5,tension:0.4,
-     pointRadius:2.5,pointBackgroundColor:'#111',fill:false,order:1,
-     _showLabel:true,_fmt:v=>v?String(v):''},
-  ]},options:{...bO,plugins:{...bO.plugins,tooltip:{
+  mkC('c5',{type:'bar',data:{labels:ml,datasets:[
+    {label:`${selYear-1}년`,data:prevNeg,type:'line',fill:false,tension:0.4,
+     borderColor:'#999',borderWidth:1.5,borderDash:[5,4],pointRadius:0,order:1},
+    {label:`${selYear}년`,data:negD,type:'bar',backgroundColor:'#111',borderRadius:5,
+     barPercentage:0.5,order:2,_showLabel:true,_fmt:v=>v?String(v):''},
+  ]},options:{...bO,layout:{padding:{top:14}},plugins:{...bO.plugins,tooltip:{
     backgroundColor:'rgba(17,17,17,0.88)',titleFont:{size:10,family:'Inter'},bodyFont:{size:10,family:'Inter'},cornerRadius:8,padding:8,
     mode:'index',intersect:false,
     filter(item){return item.raw!==null&&item.raw!==undefined;},
